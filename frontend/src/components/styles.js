@@ -1,85 +1,74 @@
-Here is a basic implementation of a component that handles keyboard inputs for a snake game. This component uses the useState and useEffect hooks to manage state and lifecycle events. 
+Here is a simple implementation of a "Game Over" component. This component accepts a "gameOver" prop, which is a boolean indicating whether the game is over or not. When the game is over, it displays a "Game Over" message and a "Play Again" button. 
 
 ```jsx
-import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
+import React, { PropTypes } from 'react';
 
-// CSS-in-JS Styling
+// CSS-in-JS styling
 const styles = {
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    backgroundColor: '#f5f5f5',
-  },
+    gameOver: {
+        fontSize: '2em',
+        color: 'red',
+        textAlign: 'center',
+    },
+    button: {
+        fontSize: '1em',
+        marginTop: '20px',
+    }
 };
 
-// This component is responsible to manage the keyboard inputs to control the snake movement
-function SnakeController({ onDirectionChange }) {
-  //initial direction is set to right
-  const [direction, setDirection] = useState('right');
+// GameOver component
+const GameOver = ({ gameOver, onPlayAgain }) => {
+    if (!gameOver) {
+        return null;
+    }
 
-  // This effect will listen to keydown event
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      switch (event.keyCode) {
-        case 37:
-          setDirection('left');
-          break;
-        case 38:
-          setDirection('up');
-          break;
-        case 39:
-          setDirection('right');
-          break;
-        case 40:
-          setDirection('down');
-          break;
-        default:
-          break;
-      }
-      onDirectionChange(direction);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    // cleanup function will remove event listener when component unmounts
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [direction, onDirectionChange]);
-
-  return (
-    <div style={styles.container}>
-      Use arrow keys to control the snake movement
-    </div>
-  );
-}
-
-SnakeController.propTypes = {
-  onDirectionChange: PropTypes.func.isRequired,
+    return (
+        <div style={styles.gameOver}>
+            <p>Game Over</p>
+            <button style={styles.button} onClick={onPlayAgain}>Play Again</button>
+        </div>
+    )
 };
 
-export default SnakeController;
+// Prop types for the GameOver component
+GameOver.propTypes = {
+    gameOver: PropTypes.bool.isRequired,
+    onPlayAgain: PropTypes.func.isRequired,
+};
+
+export default GameOver;
 ```
 
-For the PropTypes, we have:
-```jsx
-SnakeController.propTypes = {
-  onDirectionChange: PropTypes.func.isRequired,
-};
-```
+Now, let's write a basic unit test setup for the GameOver component using Jest and Enzyme:
 
-For the basic unit test setup, you can use Jest and Enzyme like this:
 ```jsx
+import React from 'react';
 import { shallow } from 'enzyme';
-import SnakeController from './SnakeController';
+import GameOver from './GameOver';
 
-describe('<SnakeController />', () => {
-  it('renders without crashing', () => {
-    shallow(<SnakeController onDirectionChange={() => {}} />);
-  });
+describe('<GameOver />', () => {
+    it('renders without crashing', () => {
+        shallow(<GameOver gameOver={true} onPlayAgain={() => {}} />);
+    });
+
+    it('does not render anything if game is not over', () => {
+        const wrapper = shallow(<GameOver gameOver={false} onPlayAgain={() => {}} />);
+        expect(wrapper.isEmptyRender()).toBe(true);
+    });
+
+    it('renders game over message and play again button if game is over', () => {
+        const wrapper = shallow(<GameOver gameOver={true} onPlayAgain={() => {}} />);
+        expect(wrapper.text()).toContain('Game Over');
+        expect(wrapper.find('button').length).toBe(1);
+    });
+
+    it('calls onPlayAgain when play again button is clicked', () => {
+        const onPlayAgain = jest.fn();
+        const wrapper = shallow(<GameOver gameOver={true} onPlayAgain={onPlayAgain} />);
+        wrapper.find('button').simulate('click');
+        expect(onPlayAgain).toHaveBeenCalled();
+    });
 });
 ```
-Remember to add the necessary packages to your project to run this test.
+
+This test suite checks the basic functionality of the GameOver component, including the "Play Again" button click event.
