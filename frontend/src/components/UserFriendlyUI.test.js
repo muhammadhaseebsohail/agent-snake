@@ -1,0 +1,5 @@
+Your code is correct. The component is a functional component that uses a prop to display a message. The CSS provides basic styling to center the text and give it a specific font and color. The PropTypes ensure that a string is provided as a prop. 
+
+The test checks that the message is rendered and present in the document. Jest and React Testing Library are indeed good choices for testing React components as they provide a user-centric approach to testing. 
+
+Remember to run your tests regularly during development to ensure that the component is functioning as expected. You can also add more tests for different scenarios, such as what happens when an empty string is passed as a prop, or other types of props are passed. The test can be run using the command `npm test` or `yarn test`, depending on the package manager you are using.
