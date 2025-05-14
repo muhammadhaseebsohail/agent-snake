@@ -1,43 +1,42 @@
-Here is a basic unit test setup for the SnakeController component using Jest and React Testing Library.
+Based on the previous example, we can write a similar unit test setup for the GameOver component using Jest and React Testing Library:
+
+First, install the necessary libraries if you haven't done it yet:
+
+```bash
+npm install --save-dev @testing-library/react @testing-library/jest-dom
+```
+
+And here is the test:
 
 ```jsx
+import React from 'react';
 import { render, fireEvent } from '@testing-library/react';
-import SnakeController from './SnakeController';
+import '@testing-library/jest-dom/extend-expect';
+import GameOver from './GameOver';
 
-describe('<SnakeController />', () => {
-  it('renders without crashing', () => {
-    const handleDirectionChange = jest.fn();
-    render(<SnakeController onDirectionChange={handleDirectionChange}/>);
-  });
+describe('<GameOver />', () => {
+    it('renders without crashing', () => {
+        render(<GameOver gameOver={true} onPlayAgain={() => {}} />);
+    });
 
-  it('should call onDirectionChange with correct direction on arrow key press', () => {
-    const handleDirectionChange = jest.fn();
-    render(<SnakeController onDirectionChange={handleDirectionChange}/>);
+    it('does not render anything if game is not over', () => {
+        const { container } = render(<GameOver gameOver={false} onPlayAgain={() => {}} />);
+        expect(container.firstChild).toBeNull();
+    });
 
-    fireEvent.keyDown(window, { keyCode: 37 }); // left arrow
-    expect(handleDirectionChange).toHaveBeenCalledWith('left');
+    it('renders game over message and play again button if game is over', () => {
+        const { getByText } = render(<GameOver gameOver={true} onPlayAgain={() => {}} />);
+        expect(getByText('Game Over')).toBeInTheDocument();
+        expect(getByText('Play Again')).toBeInTheDocument();
+    });
 
-    fireEvent.keyDown(window, { keyCode: 38 }); // up arrow
-    expect(handleDirectionChange).toHaveBeenCalledWith('up');
-
-    fireEvent.keyDown(window, { keyCode: 39 }); // right arrow
-    expect(handleDirectionChange).toHaveBeenCalledWith('right');
-
-    fireEvent.keyDown(window, { keyCode: 40 }); // down arrow
-    expect(handleDirectionChange).toHaveBeenCalledWith('down');
-  });
-
-  it('should not call onDirectionChange on other key press', () => {
-    const handleDirectionChange = jest.fn();
-    render(<SnakeController onDirectionChange={handleDirectionChange}/>);
-
-    fireEvent.keyDown(window, { keyCode: 65 }); // 'A' key
-    expect(handleDirectionChange).not.toHaveBeenCalled();
-  });
+    it('calls onPlayAgain when play again button is clicked', () => {
+        const onPlayAgain = jest.fn();
+        const { getByText } = render(<GameOver gameOver={true} onPlayAgain={onPlayAgain} />);
+        fireEvent.click(getByText('Play Again'));
+        expect(onPlayAgain).toHaveBeenCalledTimes(1);
+    });
 });
 ```
 
-This test suite will test if the SnakeController component:
-1. Renders without crashing
-2. Calls the onDirectionChange prop with the correct direction when an arrow key is pressed
-3. Does not call the onDirectionChange prop when a key other than an arrow key is pressed
+This test suite checks the basic functionality of the GameOver component, including the "Play Again" button click event. React Testing Library aims to test the component in a way that is similar to how a user would, which can make the tests more robust and less prone to implementation details.
